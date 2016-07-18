@@ -1,4 +1,4 @@
-<?php
+//<?php
 /**
  * EvoContentGallery
  *
@@ -16,5 +16,4 @@
  */
 
 //AUTHOR: ProjectSoft (projectsoft@ioweb.ru, projectsoft2009@yandex.ru)
-
-?>
+include_once('../assets/modules/evocontentgallery/module.evocontentgallery.php');
