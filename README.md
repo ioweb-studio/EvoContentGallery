@@ -1,9 +1,4 @@
 # EvoContentGallery
 Модуль галереи изображений для MODx Evo
-<dl>
-  <dt>Definition list</dt>
-  <dd>Is something people use sometimes.</dd>
-
-  <dt>Markdown in HTML</dt>
-  <dd>Does *not* work **very** well. Use HTML <em>tags</em>.</dd>
-</dl>
+<h1 style="color: red;">МОДУЛЬ НАХОДИТСЯ В РАЗРАБОТКЕ!!!</h1>
+<p style="color: red;">Реализов по модулю пока нет!</p>
