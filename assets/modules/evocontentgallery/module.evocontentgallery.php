@@ -16,5 +16,11 @@
  */
 
 //AUTHOR: ProjectSoft (projectsoft@ioweb.ru, projectsoft2009@yandex.ru)
-echo "<h1>Module EvoContentGallery</h1>";
+if (IN_MANAGER_MODE != 'true') {
+	die('<h1>ERROR:</h1><p>Please use the MODx Content Manager instead of accessing this file directly.</p>');
+}
+include_once(MODX_BASE_PATH.'assets/modules/evocontentgallery/class/evocontentgallery.class.php');
+$OP = new EvoContentGallery($modx);
+$output = $OP->run();
+echo $output;
 ?>
