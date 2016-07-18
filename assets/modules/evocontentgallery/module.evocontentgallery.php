@@ -16,5 +16,5 @@
  */
 
 //AUTHOR: ProjectSoft (projectsoft@ioweb.ru, projectsoft2009@yandex.ru)
-
+echo "<h1>Module EvoContentGallery</h1>";
 ?>
