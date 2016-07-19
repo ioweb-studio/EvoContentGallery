@@ -178,7 +178,7 @@ class EvoContentGallery {
 		$output = "";
 		while($row=$this->modx->db->getRow($rows)){
 			$checked 	= (int)$row['published'] == 1 ? " checked=\"checked\"" : "";
-			$images = json_decode($row["iamges"]);
+			$images = json_decode($row["images"]);
 			$imagesCount = count($images);
 			$output .= "<tr>
 				<td class=\"city_name\" align=\"left\">
@@ -191,7 +191,7 @@ class EvoContentGallery {
 					<span class=\"name-city\">".$row['sort']."</span>
 				</td>
 				<td class=\"count-cell text-center\" align=\"center\">
-					{$imagesCount}
+					<b>".$imagesCount."</b>".($imagesCount ? "<br><img src=\"../".$images[0]->src."\"  style=\"height: 100px;\" />" : "")."
 				</td>
 				<td class=\"count-cell text-center\" align=\"center\">
 					<input type=\"checkbox\" disabled".$checked." />
@@ -256,7 +256,7 @@ class EvoContentGallery {
 				$chekval = $row["published"]==0 ? 0 : 1;
 				$fields['row.published'] = "<label class=\"warning label_maps\">".$this->lang['module_check_published']."&nbsp;<input type=\"checkbox\" class=\"checkbox\" name=\"publishedcheck\"".$checked."onclick=\"changestate(document.module.published);\" /><input type=\"hidden\" name=\"published\" value=\"".$chekval."\" /></label>";
 				$fields['row.content'] = "<textarea name=\"gallery_content\" id=\"gallery_content\" onchange=\"documentDirty=true;\">".$this->modx->htmlspecialchars(stripslashes($row['content']))."</textarea>";
-				$fields['row.images'] = $this->modx->htmlspecialchars(stripslashes($row['images']));
+				$fields['row.images'] = $row['images'];
 			}else{
 				// Записи нет
 				// Отправить в список галлерей
@@ -287,6 +287,10 @@ class EvoContentGallery {
 	// Сохранение Галереи
 	private function saveGallery($id=0){
 		$cityname = (empty($_REQUEST['name']) || trim($_REQUEST['name'])=="") ? "Новый Объект" : trim($_REQUEST['name']);
+		$req = $_POST;
+		$req["gallery_content"] = trim($this->escape($req["gallery_content"]));
+		$imgObject = json_decode($req["images"]);
+		$req["images"] =  trim($this->escape(json_encode($imgObject)));
 		$this->saveID = $id;
 		if(!$id){
 			// Add gallery
@@ -294,8 +298,8 @@ class EvoContentGallery {
 			$total = $this->modx->db->getRecordCount($result)+1;
 			$fields = array(
 				'name' => $this->escape($cityname),
-				'images' => $this->escape(trim($_REQUEST['images'])),
-				'content'=>$this->escape(trim($_REQUEST['gallery_content'])),
+				'images' =>$req["images"],
+				'content'=>$req["gallery_content"],
 				'sort'=>$total,
 				'published'=> $this->escape(trim($_REQUEST['published'])),
 				'createdon'=>time() + $this->modx->config['server_offset_time']
@@ -304,8 +308,8 @@ class EvoContentGallery {
 		}else{
 			$fields = array(
 				'name' => $this->escape($cityname),
-				'images' => $this->escape(trim($_REQUEST['images'])),
-				'content'=>$this->escape(trim($_REQUEST['gallery_content'])),
+				'images' => $req["images"],
+				'content'=>$req["gallery_content"],
 				'published'=> $this->escape(trim($_REQUEST['published']))
 			);
 			$this->modx->db->update($fields, $this->table_galleries, "id = ".$this->saveID);

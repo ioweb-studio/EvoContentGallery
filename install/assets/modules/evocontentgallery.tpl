@@ -12,7 +12,7 @@
  * @internal	@dependencies requires files located at /assets/modules/evocontentgallery/
  * @internal	@modx_category Content
  * @internal    @installset base, sample
- * @lastupdate  18/07/2016
+ * @lastupdate  20/07/2016
  */
 
 //AUTHOR: ProjectSoft (projectsoft@ioweb.ru, projectsoft2009@yandex.ru)
