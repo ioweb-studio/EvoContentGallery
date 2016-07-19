@@ -16,4 +16,4 @@
  *
  */
 //AUTHOR: ProjectSoft (projectsoft@ioweb.ru, projectsoft2009@yandex.ru)
-require MODX_BASE_PATH.'assets/snippet/evocontentgallery/snippet.evocontentgallery.php';
+require MODX_BASE_PATH.'assets/snippets/evocontentgallery/snippet.evocontentgallery.php';
