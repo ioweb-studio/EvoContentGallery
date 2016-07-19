@@ -11,6 +11,7 @@ $_lang_module = array(
 	"module_sort_galleries"			=>	"Сортировать галереи",
 	"module_state_published"		=>	"Состояние публикации",
 	"module_gallery_id"				=>	"ID Галереи",
+	"module_gallery_name"			=>	"Название Галереи",
 	"module_gallery_sort"			=>	"Порядок",
 	"module_gallery_images_count"	=>	"Кол-во Изображений",
 	"module_check_published"		=>	"Опубликовано",

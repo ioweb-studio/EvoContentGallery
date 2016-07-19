@@ -112,17 +112,12 @@ class EvoContentGallery {
 			'theme'=>$this->theme,
 			'module_theme'=>$this->moduleTheme,
 			'module_id'=>$this->moduleid,
-			'footer'=> $this->footer, /*'<div class="row">
-				<div class="pull-right">
-					<a class="image_copy" href="http://ioweb.ru/" target="_blank"><img src="'.$this->moduleTheme.'images/ioweb.svg" alt="WEB студия IOWEB" style"vertical-align: middle;" /></a>
-				</div>
-			</div>',*/
+			'footer'=> $this->footer,
 			'module_name'=>$this->lang["module"]." «".$this->name."»",
 			'module_debug_info'=>"",
 			'rand'=>"?_=".time()
 		);
 		$this->fields = array_merge($this->fields, $this->lang);
-		$this->fields["view_debug"] = print_r($this->fields, true);
 	}
 	
 	// Сортировка
@@ -178,7 +173,7 @@ class EvoContentGallery {
 	// Вывод списка галлерей
 	private function showGalleries(){
 		$fields = array();
-		$sql 	= "SELECT id FROM ".$this->table_galleries." ORDER BY sort ASC";
+		$sql 	= "SELECT * FROM ".$this->table_galleries." ORDER BY sort ASC";
 		$rows = $this->modx->db->query($sql);
 		$output = "";
 		while($row=$this->modx->db->getRow($rows)){
@@ -187,22 +182,27 @@ class EvoContentGallery {
 			$imagesCount = count($images);
 			$output .= "<tr>
 				<td class=\"city_name\" align=\"left\">
-					<span class=\"name-city\">".$row['name']."</span>
-					<q class=\"count\">".$imagesCount."</q>
+					<span class=\"name-city\">".$row['id']."</span>
 				</td>
-				<td class=\"published-cell text-center\" align=\"center\">
+				<td class=\"city_name\" align=\"left\">
+					<span class=\"name-city\">".$row['name']."</span>
+				</td>
+				<td class=\"city_name\" align=\"left\">
+					<span class=\"name-city\">".$row['sort']."</span>
+				</td>
+				<td class=\"count-cell text-center\" align=\"center\">
+					{$imagesCount}
+				</td>
+				<td class=\"count-cell text-center\" align=\"center\">
 					<input type=\"checkbox\" disabled".$checked." />
 				</td>
 				<td align=\"right\">
-					<ul class=\"button-block\">
+					<ul class=\"actionButtons\">
 						<li class=\"\">
-							<a class=\"btn primary\" href=\"javascript:;\" onclick=\"document.location.href='index.php?a=112&id=".$this->moduleid."&aid=".$row['id']."&action=1';\">".$this->lang['module_edit_cite']."</a>
+							<a class=\"btn primary\" href=\"javascript:;\" onclick=\"document.location.href='index.php?a=112&id=".$this->moduleid."&aid=".$row['id']."&action=1';\"><img src=\"".$this->iconfolder."save.png\" />&nbsp;".$this->lang['module_edit_gallery']."</a>
 						</li>
 						<li class=\"\">
-							<a class=\"btn primary btn-list\" href=\"javascript:;\" onclick=\"document.location.href='index.php?a=112&id=".$this->moduleid."&parent=".$row['id']."&action=9';\">".$this->lang['module_points_listmin']."<sup>(".$row['objects'].")</sup></a>
-						</li>
-						<li class=\"\">
-							<a class=\"btn default\" href=\"javascript:;\" onclick=\"document.location.href='index.php?a=112&id=".$this->moduleid."&aid=".$row['id']."&action=3';\">".$this->lang['module_delete_cite']."</a>
+							<a class=\"btn\" href=\"javascript:;\" onclick=\"document.location.href='index.php?a=112&id=".$this->moduleid."&aid=".$row['id']."&action=3';\"><img src=\"".$this->iconfolder."delete.png\" />&nbsp;".$this->lang['module_delete_gallery']."</a>
 						</li>
 					</ul>
 				</td>
@@ -215,15 +215,6 @@ class EvoContentGallery {
 	
 	// Добавление / Редактирование Галереи
 	private function showGallery($id=0){
-		/*
-		`id`
-		`name`
-		`images`
-		`content`
-		`sort`
-		`published`
-		`createdon`
-		*/
 		$fields = array(
 			'row.id'=>'',
 			'row.name' => '',
@@ -233,12 +224,104 @@ class EvoContentGallery {
 			'row.published'=>'',
 			'row.createdon'=>''
 		);
+		// Редактор
+		$use_editor = intval($this->modx->config["use_editor"]);
+		$which_editor = $this->modx->config["which_editor"];
+		$stay = (empty($_REQUEST["stay"]) || !is_numeric($_REQUEST["stay"]) || !isset($_REQUEST["stay"])) ? 0 : intval($_REQUEST["stay"]);
+		$stayOpt=array($this->lang['edit_close'], $this->lang['edit_continue']);
+		$stayOptions = "";
+		
+		for($i=0; $i < count($stayOpt); ++$i){
+			$selected = $stay==$i ? " selected=\"selected\"" : "";
+			$stayOptions .= "<option value=\"".$i."\"".$selected.">".$stayOpt[$i]."</option>";
+		}
+		$fields['option.stay'] = $stayOptions;
+		if(!$id){
+			// Новая Галерея
+			$fields['module_show_title'] = $this->lang["module_add_gallery"];
+			$fields['row.id'] = "<input type=\"hidden\" name=\"action\" value=\"2\" />";
+			$fields['row.name'] = "<input class=\"inputBox\" type=\"text\" name=\"name\" value=\"\" maxlength=\"255\" />";
+			$fields['row.published'] = "<label class=\"warning\">".$this->lang['module_check_published']."&nbsp;<input type=\"checkbox\" class=\"checkbox\" name=\"publishedcheck\" checked=\"checked\" onclick=\"changestate(document.module.published);\" /><input type=\"hidden\" name=\"published\" value=\"1\" /></label>";
+			$fields['row.content'] = "<textarea name=\"gallery_content\" id=\"gallery_content\" onchange=\"documentDirty=true;\"></textarea>";
+			$fields['row.images'] = "&#x005B;&#x005D;";
+		}else{
+			// Редактирование
+			$result = $this->modx->db->select( '*', $this->table_galleries, "id = $id", 'id ASC', '1');
+			if($this->modx->db->getRecordCount( $result ) == 1){
+				$row = $this->modx->db->getRow($result);
+				$fields['module_show_title'] = $this->lang["module_gallery"];
+				$fields['row.name'] = "<input class=\"inputBox\" type=\"text\" name=\"name\" value=\"".$this->modx->htmlspecialchars(stripslashes($row['name']))."\" maxlength=\"255\" />";
+				$fields['row.id'] = "<input type=\"hidden\" name=\"pid\" value=\"".$row['id']."\" /><input type=\"hidden\" name=\"action\" value=\"2\" />";
+				$checked = $row["published"]==0 ? " " : " checked=\"checked\" ";
+				$chekval = $row["published"]==0 ? 0 : 1;
+				$fields['row.published'] = "<label class=\"warning label_maps\">".$this->lang['module_check_published']."&nbsp;<input type=\"checkbox\" class=\"checkbox\" name=\"publishedcheck\"".$checked."onclick=\"changestate(document.module.published);\" /><input type=\"hidden\" name=\"published\" value=\"".$chekval."\" /></label>";
+				$fields['row.content'] = "<textarea name=\"gallery_content\" id=\"gallery_content\" onchange=\"documentDirty=true;\">".$this->modx->htmlspecialchars(stripslashes($row['content']))."</textarea>";
+				$fields['row.images'] = $this->modx->htmlspecialchars(stripslashes($row['images']));
+			}else{
+				// Записи нет
+				// Отправить в список галлерей
+				return $this->showGalleries();
+			}
+		}
+		$richtexteditor = array(
+			"gallery_content"
+		);
+		$fields["richtexteditor"] = "";
+		
+		$evtOut = $this->modx->invokeEvent('OnModFormRender', array('id' => $id));
+		if(is_array($evtOut)) $fields["richtexteditor"] .= implode('',$evtOut);
+		if ($use_editor == 1) {
+			$evtOut = $this->modx->invokeEvent('OnRichTextEditorInit', array(
+				'editor' => $which_editor,
+				'elements' => $richtexteditor
+			));
+			if (is_array($evtOut))
+				$fields["richtexteditor"] .=  implode('', $evtOut);
+		}
+		$this->fields['mb_site_thumb'] = MODX_SITE_URL.'assets/'.$this->modx->config["thumbsDir"]."/";
+		$this->fields['debug_info'] = $this->fields['mb_site_thumb'];
+		$fields = array_merge($this->fields, $fields);
+		return $this->parseTemplate("gallery.tpl", $fields);
+	}
+	
+	// Сохранение Галереи
+	private function saveGallery($id=0){
+		$cityname = (empty($_REQUEST['name']) || trim($_REQUEST['name'])=="") ? "Новый Объект" : trim($_REQUEST['name']);
+		$this->saveID = $id;
+		if(!$id){
+			// Add gallery
+			$result = $this->modx->db->select('id', $this->table_galleries);
+			$total = $this->modx->db->getRecordCount($result)+1;
+			$fields = array(
+				'name' => $this->escape($cityname),
+				'images' => $this->escape(trim($_REQUEST['images'])),
+				'content'=>$this->escape(trim($_REQUEST['gallery_content'])),
+				'sort'=>$total,
+				'published'=> $this->escape(trim($_REQUEST['published'])),
+				'createdon'=>time() + $this->modx->config['server_offset_time']
+			);
+			$id = $this->modx->db->insert($fields, $this->table_galleries);
+		}else{
+			$fields = array(
+				'name' => $this->escape($cityname),
+				'images' => $this->escape(trim($_REQUEST['images'])),
+				'content'=>$this->escape(trim($_REQUEST['gallery_content'])),
+				'published'=> $this->escape(trim($_REQUEST['published']))
+			);
+			$this->modx->db->update($fields, $this->table_galleries, "id = ".$this->saveID);
+			$this->preSort();
+		}
+	}
+	
+	// Удаление галлереи
+	private function deleteGallery($id){
+		$this->modx->db->delete($this->table_galleries, "id = $id");
 	}
 	
 	// Определение действия
 	private function mackeAction(){
 		
-		$this->fields['module_debug_info'] .= "";
+		$this->fields['module_debug_info'] = "";
 		
 		if(empty($_REQUEST['action']) || !intval($_REQUEST['action'])){
 			$this->fields['module_debug_info'] .= "!intval empty action<br />";
@@ -249,9 +332,26 @@ class EvoContentGallery {
 			/**
 			** Manipulate Galleries
 			**/
-			case 1:
+			case 1: // Add Gallery
 				$id = (empty($_REQUEST["aid"]) || !is_numeric($_REQUEST["aid"]) || !isset($_REQUEST["aid"])) ? 0 : intval($_REQUEST["aid"]);
 				return $this->showGallery($id);
+				break;
+			case 2: // Save Gallery
+				$id = (empty($_REQUEST["pid"]) || !is_numeric($_REQUEST["pid"])) ? 0 : intval($_REQUEST["pid"]);
+				$stay = (empty($_REQUEST["stay"]) || !is_numeric($_REQUEST["stay"]) || !isset($_REQUEST["stay"])) ? 0 : intval($_REQUEST["stay"]);
+				$this->saveGallery($id, $parent);
+				if($stay){
+					return $this->showGallery($this->saveID);
+				}
+				return $this->showGalleries();
+				break;
+			case 3: // Delete Gallery
+				$id = (empty($_REQUEST["aid"]) || !is_numeric($_REQUEST["aid"])) ? 0 : intval($_REQUEST["aid"]);
+				if($id){
+					$this->deleteGallery($id);
+					$this->preSort();
+				}
+				return $this->showGalleries();
 				break;
 			default:
 				return $this->showGalleries();
