@@ -30,7 +30,8 @@ class EvoContentGallery {
 	private $saveID = 0;
 	// Таблица галерей
 	private $table_galleries;
-	
+	// IOWEB
+	private $footer = "";
 	public $modulePath = "";
 	
 	public function __construct($modx, $params=array()) {
@@ -42,7 +43,27 @@ class EvoContentGallery {
 		$this->moduleTheme		= MODX_SITE_URL.'assets/modules/evocontentgallery/theme/';
 		$this->modulePath		= MODX_BASE_PATH.'assets/modules/evocontentgallery/';
 		$this->managerUrl		= MODX_MANAGER_URL;
-		$this->iconfolder		= $this->managerUrl.'media/style/'.$this->theme.'/images/icons/';;
+		$this->iconfolder		= $this->managerUrl.'media/style/'.$this->theme.'/images/icons/';
+		$this->footer			='
+		<div class="evocontentgallery evocontentgallery__footer">
+			<div class="container">
+				<div class="evocontentgallery__pull_right">
+					<div class="evocontentgallery__studio evocontentgallery__pull_left">
+						<a href="http://ioweb.ru/" target="_blank">
+							<img src="'.$this->moduleTheme.'images/ioweb.svg" alt="WEB студия IOWEB" />
+							Разработка, поддержка<br />и продвижение сайтов
+						</a>
+					</div>
+					<div class="evocontentgallery__github evocontentgallery__pull_left">
+						<a href="https://github.com/ioweb-studio" target="_blank">
+							<img src="'.$this->moduleTheme.'images/github.svg" alt="WEB студия IOWEB на GitHub" />
+							Профиль<br />на GitHub
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		';
 		
 	}
 	
@@ -91,13 +112,32 @@ class EvoContentGallery {
 			'theme'=>$this->theme,
 			'module_theme'=>$this->moduleTheme,
 			'module_id'=>$this->moduleid,
-			'ioweb'=>'<a class="image_copy" href="http://ioweb.ru/" target="_blank"><img src="'.$this->moduleTheme.'images/ioweb.svg" alt="WEB студия IOWEB" style"vertical-align: middle;" /></a>',
+			'footer'=> $this->footer, /*'<div class="row">
+				<div class="pull-right">
+					<a class="image_copy" href="http://ioweb.ru/" target="_blank"><img src="'.$this->moduleTheme.'images/ioweb.svg" alt="WEB студия IOWEB" style"vertical-align: middle;" /></a>
+				</div>
+			</div>',*/
 			'module_name'=>$this->lang["module"]." «".$this->name."»",
 			'module_debug_info'=>"",
 			'rand'=>"?_=".time()
 		);
 		$this->fields = array_merge($this->fields, $this->lang);
 		$this->fields["view_debug"] = print_r($this->fields, true);
+	}
+	
+	// Сортировка
+	private function preSort() {
+		$sql 	= "SELECT id FROM ".$this->table_galleries." ORDER BY sort ASC";
+		$rows 	= $this->modx->db->query($sql);
+		$c = 0;
+		if($this->modx->db->getRecordCount($rows) >= 1) {
+			$ids = array();
+			while($row = $this->modx->db->getRow($rows)) {
+				$ids[] = '('.(int)$row['id'] .','.++$c.')';
+			}
+			$sql = "INSERT INTO ".$this->table_galleries." (id, sort) VALUES ".implode(',', $ids) . " ON DUPLICATE KEY UPDATE sort = VALUES(sort)";
+			$this->modx->db->query($sql);
+		}
 	}
 	
 	// Подготовка строки к вводу в базу
@@ -135,7 +175,95 @@ class EvoContentGallery {
     	return $tpl;
 	}
 	
+	// Вывод списка галлерей
+	private function showGalleries(){
+		$fields = array();
+		$sql 	= "SELECT id FROM ".$this->table_galleries." ORDER BY sort ASC";
+		$rows = $this->modx->db->query($sql);
+		$output = "";
+		while($row=$this->modx->db->getRow($rows)){
+			$checked 	= (int)$row['published'] == 1 ? " checked=\"checked\"" : "";
+			$images = json_decode($row["iamges"]);
+			$imagesCount = count($images);
+			$output .= "<tr>
+				<td class=\"city_name\" align=\"left\">
+					<span class=\"name-city\">".$row['name']."</span>
+					<q class=\"count\">".$imagesCount."</q>
+				</td>
+				<td class=\"published-cell text-center\" align=\"center\">
+					<input type=\"checkbox\" disabled".$checked." />
+				</td>
+				<td align=\"right\">
+					<ul class=\"button-block\">
+						<li class=\"\">
+							<a class=\"btn primary\" href=\"javascript:;\" onclick=\"document.location.href='index.php?a=112&id=".$this->moduleid."&aid=".$row['id']."&action=1';\">".$this->lang['module_edit_cite']."</a>
+						</li>
+						<li class=\"\">
+							<a class=\"btn primary btn-list\" href=\"javascript:;\" onclick=\"document.location.href='index.php?a=112&id=".$this->moduleid."&parent=".$row['id']."&action=9';\">".$this->lang['module_points_listmin']."<sup>(".$row['objects'].")</sup></a>
+						</li>
+						<li class=\"\">
+							<a class=\"btn default\" href=\"javascript:;\" onclick=\"document.location.href='index.php?a=112&id=".$this->moduleid."&aid=".$row['id']."&action=3';\">".$this->lang['module_delete_cite']."</a>
+						</li>
+					</ul>
+				</td>
+			</tr>";
+		}
+		$fields['row.galleries'] = $output;
+		$fields = array_merge($this->fields, $fields);
+		return $this->parseTemplate("galleries.tpl", $fields);
+	}
 	
+	// Добавление / Редактирование Галереи
+	private function showGallery($id=0){
+		/*
+		`id`
+		`name`
+		`images`
+		`content`
+		`sort`
+		`published`
+		`createdon`
+		*/
+		$fields = array(
+			'row.id'=>'',
+			'row.name' => '',
+			'row.images' => '',
+			'row.content'=>'',
+			'row.sort'=>'',
+			'row.published'=>'',
+			'row.createdon'=>''
+		);
+	}
+	
+	// Определение действия
+	private function mackeAction(){
+		
+		$this->fields['module_debug_info'] .= "";
+		
+		if(empty($_REQUEST['action']) || !intval($_REQUEST['action'])){
+			$this->fields['module_debug_info'] .= "!intval empty action<br />";
+			return $this->showGalleries();
+		}
+		$action = intval($_REQUEST['action']);
+		switch($action){
+			/**
+			** Manipulate Galleries
+			**/
+			case 1:
+				$id = (empty($_REQUEST["aid"]) || !is_numeric($_REQUEST["aid"]) || !isset($_REQUEST["aid"])) ? 0 : intval($_REQUEST["aid"]);
+				return $this->showGallery($id);
+				break;
+			default:
+				return $this->showGalleries();
+				break;
+		}
+	}
+	
+	// Запуск модуля
+	public function run() {
+		$this->installModule();
+		return $this->mackeAction();
+	}
 }
 
 

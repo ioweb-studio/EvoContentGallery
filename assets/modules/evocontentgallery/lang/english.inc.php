@@ -1,3 +1,33 @@
 <?php
-
+$_lang_module = array(
+	"module_evocontentgallery_name"	=>	"Модуль «Галереи для контента»",
+	"module_save"					=>	"Сохранить",
+	"module_del"					=>	"Удалить",
+	"module_gallery"				=>	"Галерея",
+	"module_galleries_list"			=>	"Список галерей",
+	"module_add_gallery"			=>	"Добавить галерею",
+	"module_edit_gallery"			=>	"Редактировать галерею",
+	"module_delete_gallery"			=>	"Удалить галерею",
+	"module_sort_galleries"			=>	"Сортировать галереи",
+	"module_state_published"		=>	"Состояние публикации",
+	"module_gallery_id"				=>	"ID Галереи",
+	"module_gallery_sort"			=>	"Порядок",
+	"module_gallery_images_count"	=>	"Кол-во Изображений",
+	"module_check_published"		=>	"Опубликовано",
+	"module_uncheck_published"		=>	"Снять с публикации",
+	"module_close"					=>	"Закрыть модуль",
+	"module_cancal"					=>	"Отмена",
+	"module_edit"					=>	"Редактировать",
+	"module_image_name"				=>	"Название",
+	"module_image_description"		=>	"Описание",
+	"module_break"					=>	"Назад",
+	"module"						=>	"Модуль",
+	"edit_continue"					=>	"Продолжить",
+	"edit_close"					=>	"Закрыть",
+	"module_action"					=>	"Действия",
+	"module_images"					=>	"Изображения для Галереи",
+	"module_text_content"			=>	"Описание Галереи",
+	"module_option_editor"			=>	"Редактор",
+	"ioweb"							=> 	'<img src="'.$this->moduleTheme.'images/ioweb.svg" alt="WEB студия IOWEB" />'
+);
 ?>
