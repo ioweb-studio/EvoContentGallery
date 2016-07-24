@@ -36,7 +36,7 @@ class EvoContentGallery {
 	
 	public function __construct($modx, $params=array()) {
 		$this->modx = $modx;
-		$this->table_galleries = $this->modx->getFullTableName("galleries");
+		$this->table_galleries = $this->modx->getFullTableName("evocontent_galleries");
 		$this->moduleid 		= (int)$_GET['id'];
 		$this->moduleurl		= 'index.php?a=112&id='.$this->moduleid;
 		$this->theme			= $this->modx->config['manager_theme'];
@@ -180,6 +180,14 @@ class EvoContentGallery {
 			$checked 	= (int)$row['published'] == 1 ? " checked=\"checked\"" : "";
 			$images = json_decode($row["images"]);
 			$imagesCount = count($images);
+			$img = "<b>".$imagesCount."</b>";
+			if($imagesCount){
+				$outimg = $this->modx->runSnippet('phpthumb', array(
+					'input'		=>	$images[0]->src,
+					'options'	=>	'w=70,h=70'
+				));
+				$img	= '<img src="../'.$outimg.'" />'.'&nbsp;&nbsp;<sup>(<b>'.$imagesCount.'</b>)</sup>';
+			}
 			$output .= "<tr>
 				<td class=\"city_name\" align=\"left\">
 					<span class=\"name-city\">".$row['id']."</span>
@@ -190,8 +198,8 @@ class EvoContentGallery {
 				<td class=\"city_name\" align=\"left\">
 					<span class=\"name-city\">".$row['sort']."</span>
 				</td>
-				<td class=\"count-cell text-center\" align=\"center\">
-					<b>".$imagesCount."</b>".($imagesCount ? "<br><img src=\"../".$images[0]->src."\"  style=\"height: 100px;\" />" : "")."
+				<td class=\"count-cell text-center\" align=\"center\" valign=\"top\">
+					".$img."
 				</td>
 				<td class=\"count-cell text-center\" align=\"center\">
 					<input type=\"checkbox\" disabled".$checked." />
@@ -315,6 +323,7 @@ class EvoContentGallery {
 			$this->modx->db->update($fields, $this->table_galleries, "id = ".$this->saveID);
 			$this->preSort();
 		}
+		$this->modx->clearCache('full');
 	}
 	
 	// Удаление галлереи

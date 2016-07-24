@@ -1,7 +1,9 @@
 <?php
 $_lang_module = array(
 	"module_evocontentgallery_name"	=>	"Модуль «Галереи для контента»",
+	"module_new_gallery"			=>	"Новая Галерея",
 	"module_save"					=>	"Сохранить",
+	"module_insert"					=>	"Вставить",
 	"module_del"					=>	"Удалить",
 	"module_gallery"				=>	"Галерея",
 	"module_galleries_list"			=>	"Список галерей",
@@ -21,6 +23,9 @@ $_lang_module = array(
 	"module_edit"					=>	"Редактировать",
 	"module_image_name"				=>	"Название",
 	"module_image_description"		=>	"Описание",
+	"module_image"					=>	"Изображение",
+	"module_add_image"				=>	"Добавить Изображение",
+	"module_delete_images"			=>	"Удалить все Изображения",
 	"module_break"					=>	"Назад",
 	"module"						=>	"Модуль",
 	"edit_continue"					=>	"Продолжить",

@@ -9,7 +9,7 @@
  * @internal	@properties
  * @internal	@guid evocontentgallery10dbbce2a1615	
  * @internal	@shareparams 1
- * @internal	@modx_category Content
+ * @internal	@modx_category EvoContentGallery
  * @internal    @installset base, sample
  * @lastupdate  20/07/2016
  */
