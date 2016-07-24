@@ -8,7 +8,7 @@
  * @category    plugin
  * @version     0.0.1
  * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
- * @internal    @properties
+ * @internal 	@properties &outerTpl=<b>outerTpl</b>;text;outerEvoContentGallery;Описание &rowTpl=<b>rowTpl</b>;text;rowEvoContentGallery
  * @internal    @events OnDocFormPrerender
  * @internal    @modx_category EvoContentGallery
  * @internal    @legacy_names EvoContentGallery
