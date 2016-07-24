@@ -12,7 +12,7 @@
  * @internal    @events OnDocFormRender
  * @internal    @modx_category EvoContentGallery
  * @internal    @legacy_names EvoContentGallery
- * @internal    @installset base, sample
+ * @internal    @installset base
  * @lastupdate  20/07/2016
  * @autor		ProjectSoft (projectsoft@ioweb.ru, projectsoft2009@yandex.ru)
  *
