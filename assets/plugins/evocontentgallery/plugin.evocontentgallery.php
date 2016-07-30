@@ -24,11 +24,14 @@ if(!defined('MODX_BASE_PATH')){die('What are you doing? Get out of here!');}
 if (!class_exists('PluginEvoContentGallery')) {
 	require_once MODX_BASE_PATH.'assets/plugins/evocontentgallery/evocontentgallery.class.php';
 }
-
+$params = array(
+	"outerTpl"	=>	$outerTpl,
+	"rowTpl"	=>	$rowTpl
+);
 $e =& $modx->event;
 switch ($e->name ) {
 	case 'OnDocFormPrerender':
-		$plg = new PluginEvoContentGallery($modx);
+		$plg = new PluginEvoContentGallery($modx, $params);
 		$out = $plg->run();
 		$e->output($out);
 		break;

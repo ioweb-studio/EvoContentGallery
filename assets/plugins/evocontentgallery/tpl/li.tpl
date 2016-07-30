@@ -1,5 +1,6 @@
 <li data-id="[+id+]">
 	<div class="evocontentgallery__wrapper_list__item" data-id="[+id+]">
+		<b>TEST</b>
 		<div class="evocontentgallery_imgwrapp text-center pull-left text-center">
 			<div class="evocontentgallery_name"><b>[+name+]</b></div>
 			[+image+]

@@ -8,6 +8,9 @@
 					[+wrapper+]
 				</ul>
 			</div>
+			<code>
+				[+debug+]
+			</code>
 		</div>
 	</div>
 </div>

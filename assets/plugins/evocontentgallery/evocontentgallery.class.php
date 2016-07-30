@@ -13,11 +13,12 @@ class PluginEvoContentGallery {
 	// Регистрация содержимого шаблонов (лишний раз не дёргаем файл)
 	private $templateRegister = array();
 	
-	public function __construct($modx){
+	public function __construct($modx, $params){
 		$this->modx					= $modx;
 		$this->table_galleries		= $this->modx->getFullTableName("evocontent_galleries");
 		$this->path					= MODX_BASE_PATH."assets/plugins/evocontentgallery";
 		$this->url					= MODX_SITE_URL."assets/plugins/evocontentgallery";
+		$this->params				= $params;
 	}
 	
 	private function getRows() {
@@ -41,7 +42,7 @@ class PluginEvoContentGallery {
 					"name"		=>	$row["name"],
 					"count"		=>	$count,
 					"image"		=>	$image,
-					"snippet"	=>	"[[EvoContentGallery? &gid=`".$row["id"]."` &display=`all` &outerTpl=`` &rowTpl=``]]"
+					"snippet"	=>	"[[EvoContentGallery? &gid=`".$row["id"]."` &display=`all` &outerTpl=`".$this->params["outerTpl"]."` &rowTpl=`".$this->params["rowTpl"]."`]]"
 				);
 				$output .= $this->parseTemplate('li.tpl', $fields);
 			}
@@ -102,7 +103,8 @@ class PluginEvoContentGallery {
 		$fields = array(
 			"wrapper"	=>	$prerender,
 			"pluginurl"	=>	$this->url,
-			"rand"		=>	"?_=".time()
+			"rand"		=>	"?_=".time(),
+			"debug"		=>	print_r($this->params, true)
 		);
 		return $this->parseTemplate('panel.tpl', $fields);
 	}
